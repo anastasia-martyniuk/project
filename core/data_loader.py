@@ -73,15 +73,17 @@ def fetch_binance_data(
     return ohlcv_df
 
 
-def download_ohlcv_data_for_liquid_pairs(liquid_pairs: dict, start_date: str = "2025-02"):
+def download_ohlcv_data_for_liquid_pairs(liquid_pairs: dict, start_date: str = "2025-02") -> list:
+    result = []
     for pair in tqdm(liquid_pairs.keys()):
         data = fetch_binance_data(pair, start_date)
         if data is None:
             print(f"Failed to load data for {pair}.")
         else:
             print(f"Data for {pair} loaded.")
+        result += data
+    return result
 
 
 if __name__ == "__main__":
-    liquid_pairs = get_liquid_pairs(base_asset="BTC", liquid_number=100)
-    download_ohlcv_data_for_liquid_pairs(liquid_pairs)
+    download_ohlcv_data_for_liquid_pairs(get_liquid_pairs())
