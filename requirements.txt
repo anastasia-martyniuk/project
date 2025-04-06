@@ -1,0 +1,12 @@
+vectorbt
+pandas
+numpy
+scipy
+plotly
+pyarrow
+ta
+numba
+ccxt
+pytest
+tqdm
+requests
