@@ -1,2 +1,3 @@
 from .sma_cross import SMACrossover
-from .vwap_reversion import VWAPReversion
+from .vwap_reversion import VWAPReversionIntraday
+from .atr_based import ATRBasedTrailingBreakout

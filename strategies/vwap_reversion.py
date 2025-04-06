@@ -5,7 +5,7 @@ from strategies.base import StrategyBase
 from core.data_loader import get_liquid_pairs, fetch_binance_data
 
 
-class VWAPReversion(StrategyBase):
+class VWAPReversionIntraday(StrategyBase):
     def __init__(self, price_data: pd.DataFrame):
         super().__init__(price_data)
         self.price_data = price_data
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     for liquid_pair in liquid_pairs:
         print(f"Start working with {liquid_pair}")
         print(
-            VWAPReversion(
+            VWAPReversionIntraday(
                 price_data=fetch_binance_data(pair=liquid_pair)).get_metrics(
                 column='vwap_portfolio_value', position_column='vwap_position'
             )
