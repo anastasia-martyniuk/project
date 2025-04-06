@@ -12,8 +12,11 @@ import requests
 import zipfile
 
 
+DATA_DIR = os.path.join(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')), 'data')
+
+
 def get_liquid_pairs(base_asset: str = "BTC", liquid_number: int = 100, cache_file: str = "liquid_pairs.json") -> dict:
-    cache_file_path = os.path.join('../data', cache_file)
+    cache_file_path = os.path.join(DATA_DIR, cache_file)
     if os.path.exists(cache_file_path):
         with open(cache_file_path, 'r') as f:
             print(f"Downloaded liquid pairs from {cache_file}.")
@@ -38,11 +41,8 @@ def get_liquid_pairs(base_asset: str = "BTC", liquid_number: int = 100, cache_fi
     return liquid_pairs
 
 
-def fetch_binance_data(
-    pair: str, start_date: str, interval: str = "1m", cache_dir: str = "../data"
-) -> DataFrame | None:
-    os.makedirs(cache_dir, exist_ok=True)
-    cache_file_path = os.path.join(cache_dir, f"{pair}_{interval}_feb25.parquet")
+def fetch_binance_data(pair: str, start_date: str = "2025-02", interval: str = "1m") -> DataFrame | None:
+    cache_file_path = os.path.join(DATA_DIR, f"{pair}_{interval}_feb25.parquet")
 
     if os.path.exists(cache_file_path):
         print(f"Download from cache: {pair}")
@@ -73,17 +73,8 @@ def fetch_binance_data(
     return ohlcv_df
 
 
-def download_ohlcv_data_for_liquid_pairs(liquid_pairs: dict, start_date: str = "2025-02") -> list:
-    result = []
-    for pair in tqdm(liquid_pairs.keys()):
-        data = fetch_binance_data(pair, start_date)
-        if data is None:
-            print(f"Failed to load data for {pair}.")
-        else:
-            print(f"Data for {pair} loaded.")
-        result += data
-    return result
-
-
 if __name__ == "__main__":
-    download_ohlcv_data_for_liquid_pairs(get_liquid_pairs())
+    pairs_scope = get_liquid_pairs()
+    for liquid_pair in pairs_scope:
+        print(f"Start working with {liquid_pair}")
+        fetch_binance_data(pair=liquid_pair)
