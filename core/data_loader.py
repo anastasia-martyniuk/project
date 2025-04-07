@@ -1,6 +1,7 @@
 import io
 import json
 import os
+from typing import Literal
 
 from pandas import DataFrame
 from tqdm import tqdm
@@ -41,7 +42,7 @@ def get_liquid_pairs(base_asset: str = "BTC", liquid_number: int = 100, cache_fi
     return liquid_pairs
 
 
-def fetch_binance_data(pair: str, start_date: str = "2025-02", interval: str = "1m") -> DataFrame | None:
+def fetch_binance_data(pair: str, start_date: str = "2025-02", interval: str = "1m") -> pd.DataFrame | None:
     cache_file_path = os.path.join(DATA_DIR, f"{pair}_{interval}_feb25.parquet")
 
     if os.path.exists(cache_file_path):
@@ -73,8 +74,37 @@ def fetch_binance_data(pair: str, start_date: str = "2025-02", interval: str = "
     return ohlcv_df
 
 
+def load_price_data(interval: str = "1m") -> pd.DataFrame:
+    all_data, symbols = [], []
+
+    for filename in os.listdir(DATA_DIR):
+        if filename.endswith(f".parquet"):
+            symbol = filename.split(f"_{interval}_")[0]
+            df = pd.read_parquet(os.path.join(DATA_DIR, filename))
+
+            # df = df[["timestamp", "close", "high", "low"]].copy()
+            # df.set_index('timestamp', inplace=True)
+            # df.rename(columns={'close': f'close {symbol}'}, inplace=True)
+
+            df = df[["timestamp", "close"]].copy()
+            df.set_index('timestamp', inplace=True)
+            df.rename(columns={'close': symbol}, inplace=True)
+
+            all_data.append(df)
+            symbols.append(symbol)
+
+    if all_data:
+        merged_df = pd.concat(all_data, axis=1)
+        merged_df = merged_df.sort_index()
+        return merged_df
+
+    raise ValueError("No price data found.")
+
+
 if __name__ == "__main__":
     pairs_scope = get_liquid_pairs()
     for liquid_pair in pairs_scope:
         print(f"Start working with {liquid_pair}")
         fetch_binance_data(pair=liquid_pair)
+        break
+    load_price_data(strategy='vwap')
