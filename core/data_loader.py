@@ -106,5 +106,4 @@ if __name__ == "__main__":
     for liquid_pair in pairs_scope:
         print(f"Start working with {liquid_pair}")
         fetch_binance_data(pair=liquid_pair)
-        break
-    load_price_data(strategy='vwap')
+    load_price_data()
